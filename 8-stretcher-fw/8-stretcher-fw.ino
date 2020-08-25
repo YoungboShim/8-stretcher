@@ -22,32 +22,48 @@ void setup() {
   pwm.setPWMFreq(FREQUENCY);  // Analog servos run at ~60 Hz updates
 }
 
-void loop1() {
-  setAllPosition(0);
-  delay(500);
-  turnAllOff();
-  delay(1000);
-  setAllPosition(180);
-  delay(500);
-  turnAllOff();
-  delay(1000);
-}
-
-void loop() {
-  setAllPosition(0);
-  delay(500);
-  turnAllOff();
-  delay(1000);
-
-  for(int i = 8; i < 16; i+=2){
-    setPosition(i, 180);
-    delay(300);
-    turnOff(i);
-  }
-  for(int i = 9; i < 16; i+=2){
-    setPosition(i, 180);
-    delay(300);
-    turnOff(i);
+void loop() {  
+  if(Serial.available())
+  {
+    String cmd = Serial.readString();
+    cmd.trim();
+    Serial.println(cmd);
+    if(cmd[0] == 't' && cmd[2] == 'p' && cmd.length() == 6)
+    {
+      Serial.println("In the loop");
+      int servoNum = cmd.substring(1,2).toInt();
+      int servoPos = cmd.substring(3,6).toInt();
+      if(servoNum == 0)
+      {
+        if(0 <= servoPos && servoPos <= 180)
+        {
+          setAllPosition(servoPos);         
+        }
+        else
+        {
+          turnAllOff();
+        }
+      }
+      else if(servoNum <= 8 && servoNum > 0)
+      {
+        if(0 <= servoPos && servoPos <= 180)
+        {
+          setPosition(servoNum + 7, servoPos);         
+          Serial.print("tactor");
+          Serial.print(servoNum);
+          Serial.print(": ");
+          Serial.println(servoPos);
+        }
+        else
+        {
+          turnOff(servoNum + 7);
+          Serial.print("tactor");
+          Serial.print(servoNum);
+          Serial.println(": off");
+        }
+      }
+      delay(500);
+    }
   }
 }
 
