@@ -27,6 +27,7 @@ namespace StretcherSandbox
 
             InitSerialPort();
             CmdTextBox.KeyDown += new KeyEventHandler(EnterKeyDownHandler);
+            canvas.MouseLeftButtonDown += new MouseButtonEventHandler(canvas_MouseLeftButtonDown);
         }
 
         SerialPort serial = new SerialPort();
@@ -120,6 +121,30 @@ namespace StretcherSandbox
         private void SendBtn_Click(object sender, RoutedEventArgs e)
         {
             SendSerialCmd();
+        }
+
+        private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (canvas.IsMouseDirectlyOver)
+            {
+                Console.WriteLine("canvas clicked");
+                Point clickPoint = e.GetPosition(canvas);
+
+                Rectangle tmpRec = new Rectangle();
+                tmpRec.Stroke = Brushes.Red;
+                tmpRec.Fill = Brushes.Red;
+                tmpRec.Margin = new Thickness(clickPoint.X - 5, clickPoint.Y - 5, clickPoint.X + 5, clickPoint.Y + 5);
+                tmpRec.Width = 10;
+                tmpRec.Height = 10;
+                tmpRec.MouseLeftButtonDown += new MouseButtonEventHandler(rec_MouseLeftButtonDown);
+
+                canvas.Children.Add(tmpRec);
+            }
+        }
+
+        private void rec_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            canvas.Children.Remove((UIElement)sender);
         }
     }
 }
