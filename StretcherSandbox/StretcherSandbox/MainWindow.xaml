@@ -30,6 +30,18 @@
                 X2="600" Y2="400"
                 Stroke="Black"
                 StrokeThickness="4"/>
+            <Rectangle
+                Stroke="Red"
+                Fill="Red"
+                Margin="5, 395, 15, 405"
+                Width="10"
+                Height="10"/>
+            <Rectangle
+                Stroke="Red"
+                Fill="Red"
+                Margin="595, 395, 605, 405"
+                Width="10"
+                Height="10"/>
         </Canvas>
         <Button x:Name="PlayBtn" Content="Play" HorizontalAlignment="Left" Margin="10,293,0,0" VerticalAlignment="Top" Width="125" Grid.ColumnSpan="2" Height="123" FontSize="36" Click="PlayBtn_Click_1"/>
     </Grid>
