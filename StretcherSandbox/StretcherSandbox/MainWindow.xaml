@@ -31,6 +31,6 @@
                 Stroke="Black"
                 StrokeThickness="4"/>
         </Canvas>
-        <ListBox x:Name="listBox" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="810.4,235,-258.4,0" VerticalAlignment="Top" Width="100"/>
+        <Button x:Name="PlayBtn" Content="Play" HorizontalAlignment="Left" Margin="10,293,0,0" VerticalAlignment="Top" Width="125" Grid.ColumnSpan="2" Height="123" FontSize="36" Click="PlayBtn_Click_1"/>
     </Grid>
 </Window>
