@@ -80,6 +80,24 @@ namespace StretcherSandbox
                 ySubLines[i].Y2 = height - 5;
                 SGcanvas.Children.Add(ySubLines[i]);
             }
+
+            Rectangle startRec = new Rectangle();
+            startRec.Stroke = Brushes.Blue;
+            startRec.Fill = Brushes.Blue;
+            startRec.Margin = new Thickness(0, height - 10, 10, height);
+            startRec.Width = 10;
+            startRec.Height = 10;
+            startRec.Uid = "startRec";
+            SGcanvas.Children.Add(startRec);
+
+            Rectangle endRec = new Rectangle();
+            endRec.Stroke = Brushes.Blue;
+            endRec.Fill = Brushes.Blue;
+            endRec.Margin = new Thickness(width - 10, height - 10, width, height);
+            endRec.Width = 10;
+            endRec.Height = 10;
+            endRec.Uid = "endRec";
+            SGcanvas.Children.Add(endRec);
         }
 
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -104,7 +122,7 @@ namespace StretcherSandbox
             tmpRec.Width = 10;
             tmpRec.Height = 10;
             tmpRec.MouseLeftButtonDown += new MouseButtonEventHandler(rec_MouseLeftButtonDown);
-            tmpRec.Name = "tpRec" + (RecID++).ToString();
+            tmpRec.Uid = "tpRec" + (RecID++).ToString();
 
             SGcanvas.Children.Add(tmpRec);
             return tmpRec;
@@ -120,7 +138,7 @@ namespace StretcherSandbox
 
         private void rec_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            tactorTimeLine.removeTP(((Rectangle)sender).Name);
+            tactorTimeLine.removeTP(((Rectangle)sender).Uid);
             SGcanvas.Children.Remove((UIElement)sender);
             Console.WriteLine(tactorTimeLine.ToString());
         }
@@ -129,6 +147,29 @@ namespace StretcherSandbox
         {
             Thread playThread = new Thread(() => tactorTimeLine.playPattern(graphNum));
             playThread.Start();
+        }
+
+        public string ToLogLine()
+        {
+            return tactorTimeLine.ToLogFormat();
+        }
+
+        public void clearGraph()
+        {
+            List<UIElement> removeRecList = new List<UIElement>();
+            tactorTimeLine = new StretchTactor(serial);
+            foreach (UIElement elem in SGcanvas.Children)
+            {
+                if(elem.Uid.Contains("tpRec"))
+                {
+                    removeRecList.Add(elem);
+                }
+            }
+            foreach (UIElement elem in removeRecList)
+            {
+                SGcanvas.Children.Remove(elem);
+            }
+            RecID = 0;
         }
     }
 }

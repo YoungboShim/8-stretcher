@@ -19,9 +19,9 @@ namespace StretcherSandbox
             TimePositionList = new List<TimePosition>();
             sp = serial;
             Rectangle startRec = new Rectangle();
-            startRec.Name = "startRec";
+            startRec.Uid = "startRec";
             Rectangle endRec = new Rectangle();
-            endRec.Name = "endRec";
+            endRec.Uid = "endRec";
             TimePosition startTP = new TimePosition(0, 0, startRec);
             TimePosition endTP = new TimePosition(5000, 0, endRec);
             TimePositionList.Add(startTP);
@@ -41,11 +41,11 @@ namespace StretcherSandbox
             return false;
         }
 
-        public bool removeTP(string rmRecName)
+        public bool removeTP(string rmRecUid)
         {
             foreach(TimePosition tp in TimePositionList)
             {
-                if(tp.getRecName().Equals(rmRecName))
+                if(tp.getRecUid().Equals(rmRecUid))
                 {
                     TimePositionList.Remove(tp);
                     return true;
@@ -60,6 +60,19 @@ namespace StretcherSandbox
             foreach (TimePosition tp in TimePositionList)
             {
                 logString += tp.ToString() + " | ";
+            }
+            return logString;
+        }
+
+        public string ToLogFormat()
+        {
+            string logString = "";
+            foreach (TimePosition tp in TimePositionList)
+            {
+                if (tp.getRecUid() != "startRec" && tp.getRecUid() != "endRec")
+                {
+                    logString += tp.time.ToString() + "|" + tp.degree.ToString() + ",";
+                }
             }
             return logString;
         }
@@ -103,7 +116,7 @@ namespace StretcherSandbox
         public double time;
         public double degree;
         Rectangle tpRec;
-        delegate string RecNameBack();
+        delegate string RecUidBack();
 
         public TimePosition(double t, double d, Rectangle tmpRec)
         {
@@ -112,22 +125,22 @@ namespace StretcherSandbox
             tpRec = tmpRec;
         }
 
-        public string getRecName()
+        public string getRecUid()
         {
             if (tpRec.Dispatcher.CheckAccess())
             {
-                return tpRec.Name;
+                return tpRec.Uid;
             }
             else
             {
-                RecNameBack d = new RecNameBack(getRecName);
+                RecUidBack d = new RecUidBack(getRecUid);
                 return (string)tpRec.Dispatcher.Invoke(d, new object[] { });
             }
         }
 
         public override string ToString()
         {
-            return tpRec.Name + ": " + time.ToString() + ", " + degree.ToString();
+            return tpRec.Uid + ": " + time.ToString() + ", " + degree.ToString();
         }
     }
 }
