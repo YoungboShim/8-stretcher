@@ -64,7 +64,7 @@ namespace StretcherSandbox
             return logString;
         }
 
-        public void playPattern()
+        public void playPattern(int tactorNum)
         {
             for (int i = 0; i < TimePositionList.Count - 1; i++)
             {
@@ -72,14 +72,14 @@ namespace StretcherSandbox
                 double startDegree = TimePositionList[i].degree;
                 double endDegree = TimePositionList[i + 1].degree;
 
-                playTactor(patternTime, startDegree, endDegree);
+                playTactor(patternTime, startDegree, endDegree, tactorNum);
             }
-            sp.WriteLine("t1p000");
+            sp.WriteLine($"t{tactorNum}p000");
             Thread.Sleep(100);
-            sp.WriteLine("t1p999"); // turn off servo
+            sp.WriteLine($"t{tactorNum}p999"); // turn off servo
         }
 
-        void playTactor(double actTime, double degFrom, double degTo)
+        void playTactor(double actTime, double degFrom, double degTo, int tNum)
         {
             double currDeg = degFrom;
             double incDeg = (degTo - degFrom) / actTime * 25.0;
@@ -87,7 +87,7 @@ namespace StretcherSandbox
             DateTime startTime = DateTime.Now;
             while((DateTime.Now - startTime).TotalMilliseconds < actTime)
             {
-                string cmd = String.Format("t1p{0,3:D3}", (int)currDeg);
+                string cmd = String.Format("t{0}p{1,3:D3}", tNum, (int)currDeg);
                 sp.WriteLine(cmd);
                 //Console.WriteLine(cmd);
                 currDeg += incDeg;
