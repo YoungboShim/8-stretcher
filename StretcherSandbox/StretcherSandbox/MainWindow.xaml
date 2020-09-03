@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StretcherSandbox"
         mc:Ignorable="d"
-        Title="MainWindow" WindowState="Maximized" Width="913.2">
+        Title="MainWindow" WindowState="Maximized" Width="1228" Height="746.4">
     <Grid Margin="0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
@@ -19,7 +19,7 @@
         <ScrollViewer Name ="svLogBox" HorizontalAlignment="Left" Height="199" Margin="10,61,0,0" VerticalAlignment="Top" Width="120">
             <TextBlock x:Name="LogBox" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
-        <Button x:Name="PlayBtn" Content="Play" HorizontalAlignment="Left" Margin="10,293,0,0" VerticalAlignment="Top" Width="125" Height="123" FontSize="36" Click="PlayBtn_Click_1"/>
+        <Button x:Name="PlayBtn" Content="Play" HorizontalAlignment="Left" Margin="10,293,0,0" VerticalAlignment="Top" Width="120" Height="123" FontSize="36" Click="PlayBtn_Click_1"/>
         <Grid Name="MainGrid" Margin="10" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -32,5 +32,9 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
         </Grid>
+        <Button x:Name="ClearBtn" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="10,421,0,0" Height="39" Click="ClearBtn_Click"/>
+        <ScrollViewer HorizontalAlignment="Left" Height="175" VerticalAlignment="Top" Width="120" Margin="10,465,0,0">
+            <ListBox x:Name="EffectListBox"/>
+        </ScrollViewer>
     </Grid>
 </Window>
