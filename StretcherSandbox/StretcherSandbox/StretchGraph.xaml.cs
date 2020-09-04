@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using System.IO.Ports;
+using Newtonsoft.Json;
 
 namespace StretcherSandbox
 {
@@ -24,15 +25,13 @@ namespace StretcherSandbox
     {
         int RecID = 0;
         StretchTactor tactorTimeLine;
-        SerialPort serial;
 
-        public StretchGraph(SerialPort sp)
+        public StretchGraph()
         {
             InitializeComponent();
 
             SGcanvas.MouseLeftButtonDown += new MouseButtonEventHandler(canvas_MouseLeftButtonDown);
-            serial = sp;
-            tactorTimeLine = new StretchTactor(serial);
+            tactorTimeLine = new StretchTactor();
         }
 
         public void initSretchGraph(double width, double height)
@@ -104,13 +103,17 @@ namespace StretcherSandbox
         {
             if (SGcanvas.IsMouseDirectlyOver)
             {
-                Point clickPoint = e.GetPosition(SGcanvas);
-                Rectangle newRec = AddRectangleToCanvas(clickPoint);
-                TimePosition newTP = tpFromPoint(clickPoint, newRec);
-
-                tactorTimeLine.addTP(newTP);
-                Console.WriteLine(tactorTimeLine.ToString());
+                AddTpPoint(e.GetPosition(SGcanvas));
             }
+        }
+
+        public void AddTpPoint(Point clickPoint)
+        {
+            Rectangle newRec = AddRectangleToCanvas(clickPoint);
+            TimePosition newTP = tpFromPoint(clickPoint, newRec);
+
+            tactorTimeLine.addTP(newTP);
+            Console.WriteLine(tactorTimeLine.ToString());
         }
 
         private Rectangle AddRectangleToCanvas(Point point)
@@ -132,8 +135,15 @@ namespace StretcherSandbox
         {
             double tpTime = point.X / SGcanvas.ActualWidth * 5000.0;
             double tpDegree = (SGcanvas.ActualHeight - point.Y) / SGcanvas.ActualHeight * 180.0;
-            Console.WriteLine("tpTime: " + tpTime.ToString() + ", tpDegree: " + tpDegree.ToString());
             return new TimePosition(tpTime, tpDegree, rect);
+        }
+
+        public Point pointFromTp(double tpTime, double tpDegree)
+        {
+            Point newPoint = new Point();
+            newPoint.X = tpTime / 5000.0 * SGcanvas.ActualWidth;
+            newPoint.Y = SGcanvas.ActualHeight - (tpDegree / 180.0 * SGcanvas.ActualHeight);
+            return newPoint;
         }
 
         private void rec_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -143,21 +153,21 @@ namespace StretcherSandbox
             Console.WriteLine(tactorTimeLine.ToString());
         }
 
-        public void playGraph(int graphNum)
+        public void playGraph(int graphNum, SerialPort sp)
         {
-            Thread playThread = new Thread(() => tactorTimeLine.playPattern(graphNum));
+            Thread playThread = new Thread(() => tactorTimeLine.playPattern(graphNum, sp));
             playThread.Start();
         }
 
-        public string ToLogLine()
+        public string ToJson()
         {
-            return tactorTimeLine.ToLogFormat();
+            return tactorTimeLine.ToJson();
         }
 
         public void clearGraph()
         {
             List<UIElement> removeRecList = new List<UIElement>();
-            tactorTimeLine = new StretchTactor(serial);
+            tactorTimeLine = new StretchTactor();
             foreach (UIElement elem in SGcanvas.Children)
             {
                 if(elem.Uid.Contains("tpRec"))
@@ -171,5 +181,6 @@ namespace StretcherSandbox
             }
             RecID = 0;
         }
+
     }
 }

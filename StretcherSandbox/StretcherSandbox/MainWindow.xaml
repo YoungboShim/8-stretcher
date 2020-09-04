@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StretcherSandbox"
         mc:Ignorable="d"
-        Title="MainWindow" WindowState="Maximized" Width="1228" Height="746.4">
+        Title="MainWindow" WindowState="Maximized" Width="1228" Height="911.4">
     <Grid Margin="0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
@@ -34,7 +34,10 @@
         </Grid>
         <Button x:Name="ClearBtn" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="10,421,0,0" Height="39" Click="ClearBtn_Click"/>
         <ScrollViewer HorizontalAlignment="Left" Height="175" VerticalAlignment="Top" Width="120" Margin="10,465,0,0">
-            <ListBox x:Name="EffectListBox"/>
+            <ListBox x:Name="EffectListBox" SelectionChanged="EffectListBox_SelectionChanged" MouseDoubleClick="EffectListBox_MouseDoubleClick"/>
         </ScrollViewer>
+        <TextBox x:Name="EffectNameTextBox" HorizontalAlignment="Left" Height="23" Margin="10,645,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,673,0,0" VerticalAlignment="Top" Width="120" Height="25" Click="SaveButton_Click"/>
+        <Button x:Name="DeleteButton" Content="Delete" HorizontalAlignment="Left" Margin="10,703,0,0" VerticalAlignment="Top" Width="120" Height="25" Click="DeleteButton_Click"/>
     </Grid>
 </Window>

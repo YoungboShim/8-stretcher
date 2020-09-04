@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO.Ports;
 using System.Threading;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace StretcherSandbox
 {
@@ -24,9 +26,10 @@ namespace StretcherSandbox
     {
         SerialPort serial = new SerialPort();
         delegate void SetTextCallBack(String text);
-        int RecID = 0;
         StretchTactor tactorTimeLine;
         StretchGraph[,] stretchGraphs = new StretchGraph[2, 4];
+        const string quote = "\"";
+        Dictionary<string, List<TimePosition>[,]> efxList = new Dictionary<string, List<TimePosition>[,]>();
 
         public MainWindow()
         {
@@ -34,7 +37,7 @@ namespace StretcherSandbox
 
             InitSerialPort();
             CmdTextBox.KeyDown += new KeyEventHandler(EnterKeyDownHandler);
-            tactorTimeLine = new StretchTactor(serial);
+            tactorTimeLine = new StretchTactor();
 
             Loaded += delegate
             {
@@ -42,7 +45,7 @@ namespace StretcherSandbox
                 {
                     for (int j = 0;j < 4; j++)
                     {
-                        stretchGraphs[i, j] = new StretchGraph(serial);
+                        stretchGraphs[i, j] = new StretchGraph();
                         MainGrid.Children.Add(stretchGraphs[i, j]);
                         stretchGraphs[i, j].initSretchGraph(MainGrid.ColumnDefinitions[0].ActualWidth - 10, MainGrid.RowDefinitions[0].ActualHeight - 10);
                         Grid.SetColumn(stretchGraphs[i, j], j);
@@ -148,7 +151,7 @@ namespace StretcherSandbox
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    stretchGraphs[i, j].playGraph(j + i * 4 + 1);
+                    stretchGraphs[i, j].playGraph(j + i * 4 + 1, serial);
                 }
             }
         }
@@ -160,6 +163,90 @@ namespace StretcherSandbox
                 for (int j = 0; j < 4; j++)
                 {
                     stretchGraphs[i, j].clearGraph();
+                }
+            }
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            StreamWriter sw = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + @"..\..\" + "EffectList.txt");
+
+            string effectName = EffectNameTextBox.Text;
+            EffectNameTextBox.Text = "";
+
+            List<TimePosition>[,] tactorList = new List<TimePosition>[2,4];
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    string tactorJson = stretchGraphs[i, j].ToJson();
+                    List<TimePosition> tactor = JsonConvert.DeserializeObject<List<TimePosition>>(tactorJson);
+                    tactorList[i, j] = tactor;
+                    //Console.WriteLine(tactorList[i, j].ToString());
+                }
+            }
+
+            efxList.Add(effectName, tactorList);
+            string json = JsonConvert.SerializeObject(efxList);
+            sw.WriteLine(json);
+            sw.Flush();
+            sw.Close();
+
+            EffectListBox.Items.Add(effectName);
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            StreamWriter sw = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + @"..\..\" + "EffectList.txt");
+
+            string item = (string)EffectListBox.SelectedItem;
+            if(item == null)
+            {
+                return;
+            }
+            else
+            {
+                efxList.Remove(item);
+                string json = JsonConvert.SerializeObject(efxList);
+                sw.WriteLine(json);
+                sw.Flush();
+                sw.Close();
+
+                EffectListBox.Items.Remove(EffectListBox.SelectedItem);
+            }
+
+        }
+
+        private void EffectListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void EffectListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Console.WriteLine("efxbox clicked~");
+            string item = (string)EffectListBox.SelectedItem;
+            if(item != null)
+            {
+                LoadEffect(item);
+            }
+        }
+
+        private void LoadEffect(string effectName)
+        {
+            List<TimePosition>[,] tpList = efxList[effectName];
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    stretchGraphs[i, j].clearGraph();
+                    for (int k = 1; k < tpList[i, j].Count - 1; k++)
+                    {
+                        double tmpTime = tpList[i, j][k].time;
+                        double tmpDegree = tpList[i, j][k].degree;
+                        stretchGraphs[i, j].AddTpPoint(stretchGraphs[i, j].pointFromTp(tmpTime, tmpDegree));
+                    }                    
                 }
             }
         }

@@ -6,18 +6,17 @@ using System.Threading.Tasks;
 using System.IO.Ports;
 using System.Windows.Shapes;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace StretcherSandbox
 {
     class StretchTactor
     {
         List<TimePosition> TimePositionList;
-        SerialPort sp;
 
-        public StretchTactor(SerialPort serial)
+        public StretchTactor()
         {
             TimePositionList = new List<TimePosition>();
-            sp = serial;
             Rectangle startRec = new Rectangle();
             startRec.Uid = "startRec";
             Rectangle endRec = new Rectangle();
@@ -64,20 +63,7 @@ namespace StretcherSandbox
             return logString;
         }
 
-        public string ToLogFormat()
-        {
-            string logString = "";
-            foreach (TimePosition tp in TimePositionList)
-            {
-                if (tp.getRecUid() != "startRec" && tp.getRecUid() != "endRec")
-                {
-                    logString += tp.time.ToString() + "|" + tp.degree.ToString() + ",";
-                }
-            }
-            return logString;
-        }
-
-        public void playPattern(int tactorNum)
+        public void playPattern(int tactorNum, SerialPort sp)
         {
             for (int i = 0; i < TimePositionList.Count - 1; i++)
             {
@@ -85,14 +71,14 @@ namespace StretcherSandbox
                 double startDegree = TimePositionList[i].degree;
                 double endDegree = TimePositionList[i + 1].degree;
 
-                playTactor(patternTime, startDegree, endDegree, tactorNum);
+                playTactor(patternTime, startDegree, endDegree, tactorNum, sp);
             }
             sp.WriteLine($"t{tactorNum}p000");
             Thread.Sleep(100);
             sp.WriteLine($"t{tactorNum}p999"); // turn off servo
         }
 
-        void playTactor(double actTime, double degFrom, double degTo, int tNum)
+        void playTactor(double actTime, double degFrom, double degTo, int tNum, SerialPort sp)
         {
             double currDeg = degFrom;
             double incDeg = (degTo - degFrom) / actTime * 25.0;
@@ -106,8 +92,16 @@ namespace StretcherSandbox
                 currDeg += incDeg;
                 Thread.Sleep(25);
             }
+        }
 
-            
+        public List<TimePosition> getList()
+        {
+            return TimePositionList;
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(TimePositionList);
         }
     }
 
