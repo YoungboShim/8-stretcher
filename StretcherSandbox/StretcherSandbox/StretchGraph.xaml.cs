@@ -24,6 +24,7 @@ namespace StretcherSandbox
     public partial class StretchGraph : UserControl
     {
         int RecID = 0;
+        int LineID = 0;
         StretchTactor tactorTimeLine;
 
         public StretchGraph()
@@ -109,11 +110,35 @@ namespace StretcherSandbox
 
         public void AddTpPoint(Point clickPoint)
         {
+            clearLine();
             Rectangle newRec = AddRectangleToCanvas(clickPoint);
             TimePosition newTP = tpFromPoint(clickPoint, newRec);
 
             tactorTimeLine.addTP(newTP);
             Console.WriteLine(tactorTimeLine.ToString());
+
+            AddConnectLines();
+        }
+
+        private void AddConnectLines()
+        {
+            List<TimePosition> tpList = tactorTimeLine.getList();
+            for(int i=0;i < tpList.Count - 1; i++)
+            {
+                Point point1 = pointFromTp(tpList[i].time, tpList[i].degree);
+                Point point2 = pointFromTp(tpList[i + 1].time, tpList[i + 1].degree);
+
+                Line connLine = new Line();
+                connLine.Stroke = Brushes.DarkBlue;
+                connLine.StrokeThickness = 1;
+                connLine.X1 = point1.X;
+                connLine.X2 = point2.X;
+                connLine.Y1 = point1.Y;
+                connLine.Y2 = point2.Y;
+                connLine.Uid = "connLine" + (LineID++).ToString();
+
+                SGcanvas.Children.Add(connLine);
+            }
         }
 
         private Rectangle AddRectangleToCanvas(Point point)
@@ -150,6 +175,8 @@ namespace StretcherSandbox
         {
             tactorTimeLine.removeTP(((Rectangle)sender).Uid);
             SGcanvas.Children.Remove((UIElement)sender);
+            clearLine();
+            AddConnectLines();
             Console.WriteLine(tactorTimeLine.ToString());
         }
 
@@ -166,11 +193,17 @@ namespace StretcherSandbox
 
         public void clearGraph()
         {
+            clearRec();
+            clearLine();
+        }
+
+        private void clearRec()
+        {
             List<UIElement> removeRecList = new List<UIElement>();
             tactorTimeLine = new StretchTactor();
             foreach (UIElement elem in SGcanvas.Children)
             {
-                if(elem.Uid.Contains("tpRec"))
+                if (elem.Uid.Contains("tpRec"))
                 {
                     removeRecList.Add(elem);
                 }
@@ -182,5 +215,21 @@ namespace StretcherSandbox
             RecID = 0;
         }
 
+        private void clearLine()
+        {
+            List<UIElement> removeLineList = new List<UIElement>();
+            foreach (UIElement elem in SGcanvas.Children)
+            {
+                if (elem.Uid.Contains("connLine"))
+                {
+                    removeLineList.Add(elem);
+                }
+            }
+            foreach (UIElement elem in removeLineList)
+            {
+                SGcanvas.Children.Remove(elem);
+            }
+            LineID = 0;
+        }
     }
 }
