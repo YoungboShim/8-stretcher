@@ -28,7 +28,6 @@ namespace StretcherSandbox
         delegate void SetTextCallBack(String text);
         StretchTactor tactorTimeLine;
         StretchGraph[,] stretchGraphs = new StretchGraph[2, 4];
-        const string quote = "\"";
         Dictionary<string, List<TimePosition>[,]> efxList = new Dictionary<string, List<TimePosition>[,]>();
 
         public MainWindow()
@@ -38,6 +37,7 @@ namespace StretcherSandbox
             InitSerialPort();
             CmdTextBox.KeyDown += new KeyEventHandler(EnterKeyDownHandler);
             tactorTimeLine = new StretchTactor();
+            InitLoadEffectList();
 
             Loaded += delegate
             {
@@ -194,6 +194,19 @@ namespace StretcherSandbox
             sw.Close();
 
             EffectListBox.Items.Add(effectName);
+        }
+
+        private void InitLoadEffectList()
+        {
+            StreamReader sw = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + @"..\..\" + "EffectList.txt");
+
+            string json = sw.ReadToEnd();
+            efxList = JsonConvert.DeserializeObject<Dictionary<string, List<TimePosition>[,]>>(json);
+
+            foreach(KeyValuePair<string, List<TimePosition>[,]> kvp in efxList)
+            {
+                EffectListBox.Items.Add(kvp.Key);
+            }
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
