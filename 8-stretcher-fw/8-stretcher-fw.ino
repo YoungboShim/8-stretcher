@@ -23,6 +23,8 @@ void setup() {
 
   pwm.begin();
   pwm.setPWMFreq(FREQUENCY);  // Analog servos run at ~60 Hz updates
+  setAllPosition(90);
+  turnAllOff();
 }
 
 void loop() {  
