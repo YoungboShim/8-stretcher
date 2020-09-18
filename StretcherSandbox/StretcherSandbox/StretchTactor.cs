@@ -6,22 +6,21 @@ using System.Threading.Tasks;
 using System.IO.Ports;
 using System.Windows.Shapes;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace StretcherSandbox
 {
     class StretchTactor
     {
         List<TimePosition> TimePositionList;
-        SerialPort sp;
 
-        public StretchTactor(SerialPort serial)
+        public StretchTactor()
         {
             TimePositionList = new List<TimePosition>();
-            sp = serial;
             Rectangle startRec = new Rectangle();
-            startRec.Name = "startRec";
+            startRec.Uid = "startRec";
             Rectangle endRec = new Rectangle();
-            endRec.Name = "endRec";
+            endRec.Uid = "endRec";
             TimePosition startTP = new TimePosition(0, 0, startRec);
             TimePosition endTP = new TimePosition(5000, 0, endRec);
             TimePositionList.Add(startTP);
@@ -41,11 +40,11 @@ namespace StretcherSandbox
             return false;
         }
 
-        public bool removeTP(string rmRecName)
+        public bool removeTP(string rmRecUid)
         {
             foreach(TimePosition tp in TimePositionList)
             {
-                if(tp.getRecName().Equals(rmRecName))
+                if(tp.getRecUid().Equals(rmRecUid))
                 {
                     TimePositionList.Remove(tp);
                     return true;
@@ -64,7 +63,7 @@ namespace StretcherSandbox
             return logString;
         }
 
-        public void playPattern()
+        public void playPattern(int tactorNum, SerialPort sp)
         {
             for (int i = 0; i < TimePositionList.Count - 1; i++)
             {
@@ -72,14 +71,14 @@ namespace StretcherSandbox
                 double startDegree = TimePositionList[i].degree;
                 double endDegree = TimePositionList[i + 1].degree;
 
-                playTactor(patternTime, startDegree, endDegree);
+                playTactor(patternTime, startDegree, endDegree, tactorNum, sp);
             }
-            sp.WriteLine("t1p000");
+            sp.WriteLine($"t{tactorNum}p000");
             Thread.Sleep(100);
-            sp.WriteLine("t1p999"); // turn off servo
+            sp.WriteLine($"t{tactorNum}p999"); // turn off servo
         }
 
-        void playTactor(double actTime, double degFrom, double degTo)
+        void playTactor(double actTime, double degFrom, double degTo, int tNum, SerialPort sp)
         {
             double currDeg = degFrom;
             double incDeg = (degTo - degFrom) / actTime * 25.0;
@@ -87,14 +86,22 @@ namespace StretcherSandbox
             DateTime startTime = DateTime.Now;
             while((DateTime.Now - startTime).TotalMilliseconds < actTime)
             {
-                string cmd = String.Format("t1p{0,3:D3}", (int)currDeg);
+                string cmd = String.Format("t{0}p{1,3:D3}", tNum, (int)currDeg);
                 sp.WriteLine(cmd);
                 //Console.WriteLine(cmd);
                 currDeg += incDeg;
                 Thread.Sleep(25);
             }
+        }
 
-            
+        public List<TimePosition> getList()
+        {
+            return TimePositionList;
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(TimePositionList);
         }
     }
 
@@ -103,7 +110,7 @@ namespace StretcherSandbox
         public double time;
         public double degree;
         Rectangle tpRec;
-        delegate string RecNameBack();
+        delegate string RecUidBack();
 
         public TimePosition(double t, double d, Rectangle tmpRec)
         {
@@ -112,22 +119,22 @@ namespace StretcherSandbox
             tpRec = tmpRec;
         }
 
-        public string getRecName()
+        public string getRecUid()
         {
             if (tpRec.Dispatcher.CheckAccess())
             {
-                return tpRec.Name;
+                return tpRec.Uid;
             }
             else
             {
-                RecNameBack d = new RecNameBack(getRecName);
+                RecUidBack d = new RecUidBack(getRecUid);
                 return (string)tpRec.Dispatcher.Invoke(d, new object[] { });
             }
         }
 
         public override string ToString()
         {
-            return tpRec.Name + ": " + time.ToString() + ", " + degree.ToString();
+            return tpRec.Uid + ": " + time.ToString() + ", " + degree.ToString();
         }
     }
 }
