@@ -98,10 +98,13 @@ void turnAllOff()
 void setPosition(int i, int pos)
 {
   pwm.setPWM(i, 0, pulseWidth(pos));
+  /*
   Serial.print("tactor");
   Serial.print(i);
   Serial.print(": ");
   Serial.println(pos);
+  Serial.flush();
+  */
 }
 
 // i = 0 ... 15, servo #
@@ -111,6 +114,7 @@ void turnOff(int i)
   Serial.print("tactor");
   Serial.print(i);
   Serial.println(": off");
+  Serial.flush();
 }
 
 //GH: What is "analog_value"? Duty cicle? Check the datasheet.
