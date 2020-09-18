@@ -21,8 +21,8 @@ namespace StretcherSandbox
             startRec.Uid = "startRec";
             Rectangle endRec = new Rectangle();
             endRec.Uid = "endRec";
-            TimePosition startTP = new TimePosition(0, 0, startRec);
-            TimePosition endTP = new TimePosition(5000, 0, endRec);
+            TimePosition startTP = new TimePosition(0, 90, startRec);
+            TimePosition endTP = new TimePosition(5000, 90, endRec);
             TimePositionList.Add(startTP);
             TimePositionList.Add(endTP);
         }
@@ -73,7 +73,7 @@ namespace StretcherSandbox
 
                 playTactor(patternTime, startDegree, endDegree, tactorNum, sp);
             }
-            sp.WriteLine($"t{tactorNum}p000");
+            sp.WriteLine($"t{tactorNum}p090");
             Thread.Sleep(100);
             sp.WriteLine($"t{tactorNum}p999"); // turn off servo
         }
@@ -88,7 +88,7 @@ namespace StretcherSandbox
             {
                 string cmd = String.Format("t{0}p{1,3:D3}", tNum, (int)currDeg);
                 sp.WriteLine(cmd);
-                //Console.WriteLine(cmd);
+                Console.WriteLine(cmd);
                 currDeg += incDeg;
                 Thread.Sleep(25);
             }

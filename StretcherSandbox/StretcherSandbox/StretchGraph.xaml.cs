@@ -84,7 +84,7 @@ namespace StretcherSandbox
             Rectangle startRec = new Rectangle();
             startRec.Stroke = Brushes.Blue;
             startRec.Fill = Brushes.Blue;
-            startRec.Margin = new Thickness(0, height - 10, 10, height);
+            startRec.Margin = new Thickness(0, (height - 10) / 2, 10, (height - 10) / 2 + 10);
             startRec.Width = 10;
             startRec.Height = 10;
             startRec.Uid = "startRec";
@@ -93,7 +93,7 @@ namespace StretcherSandbox
             Rectangle endRec = new Rectangle();
             endRec.Stroke = Brushes.Blue;
             endRec.Fill = Brushes.Blue;
-            endRec.Margin = new Thickness(width - 10, height - 10, width, height);
+            endRec.Margin = new Thickness(width - 10, (height - 10) / 2, width, (height - 10) / 2 + 10);
             endRec.Width = 10;
             endRec.Height = 10;
             endRec.Uid = "endRec";
